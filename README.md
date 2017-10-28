@@ -56,3 +56,17 @@ func main() {
   game.Start()
 }
 ```
+
+## More
+Keep trying to connect after server goes down:
+``` cs
+client.OnDisconnected(() => client.Connect());
+```
+Keep trying to connect if server is down when client starts:
+``` cs
+client.OnUnableToConnect((e) => client.Connect());
+```
+Keep track of packets you did not subscribe to:
+``` cs
+client.OnUnknownPacket((packet) => Console.WriteLine("Unknown packet: " + packet.Type));
+```
