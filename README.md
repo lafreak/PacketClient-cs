@@ -70,3 +70,19 @@ Keep track of packets you did not subscribe to:
 ``` cs
 client.OnUnknownPacket((packet) => Console.WriteLine("Unknown packet: " + packet.Type));
 ```
+Read more data at once:
+``` cs
+client.On(102, (packet) =>
+{
+  // One by one:
+  byte b = packet.ReadByte();
+  sbyte sb = packet.ReadSByte();
+  string message = packet.ReadString();
+  
+  // All at once:
+  var data = packet.Read(typeof(byte), typeof(sbyte), typeof(string));
+  byte b_ = (byte)data[0];
+  sbyte sb_ = (sbyte)data[1];
+  string message_ = (message)data[2];
+});
+```
