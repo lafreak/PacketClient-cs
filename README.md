@@ -23,7 +23,7 @@ class Program
     // When received, print result of multiplication
     client.On(40 /* Type */, (packet) =>
     {
-      // Will print 37
+      // Will print 300
       Console.WriteLine("Result: " + packet.ReadInt());
     });
     
