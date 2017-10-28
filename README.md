@@ -62,7 +62,7 @@ Try to reconnect when server goes down:
 ``` cs
 client.OnDisconnected(() => client.Connect());
 ```
-Keep trying to connect if it's not possible to connect (server down):
+Keep trying to connect if it's not possible to connect (server downtime):
 ``` cs
 client.OnUnableToConnect((e) => client.Connect());
 ```
