@@ -303,3 +303,6 @@ __pycache__/
 
 # OpenCover UI analysis results
 OpenCover/
+
+PacketClient/nuget.exe
+PacketClient/Package.nuspec
