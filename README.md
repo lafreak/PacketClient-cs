@@ -53,7 +53,7 @@ func main() {
     s.Send(40 /* Type */, (int)(x*y))
   })
   
-  game.Start()
+  serv.Start()
 }
 ```
 
