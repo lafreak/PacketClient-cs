@@ -58,11 +58,11 @@ func main() {
 ```
 
 ## More
-Keep trying to connect after server goes down:
+Try to reconnect when server goes down:
 ``` cs
 client.OnDisconnected(() => client.Connect());
 ```
-Keep trying to connect if server is down when client starts:
+Keep trying to connect if it's not possible to connect (server down):
 ``` cs
 client.OnUnableToConnect((e) => client.Connect());
 ```
