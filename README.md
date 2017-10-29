@@ -1,7 +1,7 @@
 # Packet Client
 NuGet package installation:
 ```
-Install-Package lafreak.PacketClient -Version 0.0.1 
+Install-Package lafreak.PacketClient -Version 0.0.4 
 ```
 
 C# implementation of TCP Client that works with [this server](https://github.com/lafreak/go-packet-server).
