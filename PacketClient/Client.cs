@@ -63,28 +63,49 @@ namespace PacketClient
 
         private void Listen()
         {
-            byte[] buffer = new byte[1024];
-
             while (true)
             {
-                int n;
                 try
                 {
-                    n = client.GetStream().Read(buffer, 0, 1024);
+                    Receive().ToList().ForEach((packet) =>
+                    {
+                        if (events.ContainsKey(packet.Type))
+                            events[packet.Type].Invoke(packet);
+                        else
+                            onUnknownPacket.Invoke(packet);
+                    });
                 }
-                catch (Exception)
+                catch
                 {
                     onDisconnected.Invoke();
                     client.Close();
                     return;
                 }
+            }
+        }
 
-                Packet packet = new Packet(buffer.Take(n).ToList());
+        private IEnumerable<Packet> Receive()
+        {
+            byte[] buffer = new byte[1024];
+            int n = client.GetStream().Read(buffer, 0, 1024);
 
-                if (events.ContainsKey(packet.Type))
-                    events[packet.Type].Invoke(packet);
-                else
-                    onUnknownPacket.Invoke(packet);
+            while (n > 0)
+            {
+                ushort m = BitConverter.ToUInt16(buffer, 0);
+                if (m == 0) m = 1;
+
+                Packet packet = new Packet(buffer.Take(m).ToList());
+
+                n -= m;
+                var temp = buffer.Skip(m).ToList();
+                while (temp.Count < 1024)
+                    temp.Add(0);
+                buffer = temp.ToArray();
+
+                if (m < 3)
+                    continue;
+
+                yield return packet;
             }
         }
 
@@ -119,7 +140,12 @@ namespace PacketClient
                 return;
             var packet = new Packet(type);
             packet.Write(args);
-            client.GetStream().Write(packet.Buffer, 0, packet.Size);
+
+            try
+            {
+                client.GetStream().Write(packet.Buffer, 0, packet.Size);
+            }
+            catch { }
         }
     }
 }
