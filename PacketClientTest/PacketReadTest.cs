@@ -51,5 +51,23 @@ namespace PacketClientTest
             Assert.AreEqual("kal", p.ReadString());
             Assert.AreEqual("", p.ReadString());
         }
+
+        [TestMethod]
+        public void ReadFloatTest()
+        {
+            var p = new Packet(new List<byte>() { 7,0,1, 0x3b, 0xdf, 0x1f, 0x41 });
+
+            Assert.AreEqual(9.992f, p.ReadFloat());
+            Assert.AreEqual(3, p.Size);
+        }
+
+        [TestMethod]
+        public void ReadDoubleTest()
+        {
+            var p = new Packet(new List<byte>() { 11,0,1, 0x92, 0x93, 0x89, 0x5b, 0x05, 0x31, 0xba, 0x3f });
+
+            Assert.AreEqual(0.1023105, p.ReadDouble());
+            Assert.AreEqual(3, p.Size);
+        }
     }
 }

@@ -52,11 +52,11 @@ namespace PacketClient
             }
             catch (Exception e)
             {
-                onUnableToConnect.Invoke(e);
+                onUnableToConnect(e);
                 return;
             }
 
-            onConnected.Invoke();
+            onConnected();
 
             Listen();
         }
@@ -70,15 +70,16 @@ namespace PacketClient
                     Receive().ToList().ForEach((packet) =>
                     {
                         if (events.ContainsKey(packet.Type))
-                            events[packet.Type].Invoke(packet);
+                            events[packet.Type](packet);
                         else
-                            onUnknownPacket.Invoke(packet);
+                            onUnknownPacket(packet);
                     });
                 }
                 catch
                 {
-                    onDisconnected.Invoke();
+                    client.GetStream().Close();
                     client.Close();
+                    onDisconnected();
                     return;
                 }
             }
@@ -153,7 +154,10 @@ namespace PacketClient
             {
                 client.GetStream().Write(packet.Buffer, 0, packet.Size);
             }
-            catch { }
+            catch
+            {
+                onDisconnected();
+            }
         }
     }
 }

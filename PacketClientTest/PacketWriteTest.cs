@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PacketClient;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PacketClientTest
 {
@@ -119,6 +120,28 @@ namespace PacketClientTest
             Assert.AreEqual(121, packet.Buffer[5]);
             Assert.AreEqual(0, packet.Buffer[6]);
             Assert.AreEqual(7, packet.Size);
+        }
+
+        [TestMethod]
+        public void WriteFloatTest()
+        {
+            packet.Write(3.13f);
+
+            Assert.AreEqual(7, packet.Size);
+            CollectionAssert.AreEquivalent(
+                new byte[] { 0xec, 0x51, 0x48, 0x40 }, 
+                packet.Buffer.Skip(3).Take(4).ToArray());
+        }
+
+        [TestMethod]
+        public void WriteDoubleTest()
+        {
+            packet.Write(0.851012351);
+
+            Assert.AreEqual(11, packet.Size);
+            CollectionAssert.AreEquivalent(
+                new byte[] { 0xb3, 0x2f, 0x01, 0x41, 0x7e, 0x3b, 0xeb, 0x3f },
+                packet.Buffer.Skip(3).Take(8).ToArray());
         }
     }
 }

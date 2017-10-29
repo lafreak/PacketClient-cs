@@ -96,7 +96,9 @@ namespace PacketClient
                 { typeof(uint),     write },
                 { typeof(long),    write },
                 { typeof(ulong),   write },
-                { typeof(string),   writestring }
+                { typeof(string),   writestring },
+                { typeof(float), write },
+                { typeof(double), write }
             };
 
             foreach (var arg in args)
@@ -199,6 +201,26 @@ namespace PacketClient
             return Encoding.UTF8.GetString(bytes);
         }
 
+        public float ReadFloat()
+        {
+            if (Size < 3 + 4)
+                return 0.0f;
+
+            float f = BitConverter.ToSingle(data.ToArray(), 3);
+            RemoveSize(4);
+            return f;
+        }
+
+        public double ReadDouble()
+        {
+            if (Size < 3 + 8)
+                return 0.0f;
+
+            double d = BitConverter.ToDouble(data.ToArray(), 3);
+            RemoveSize(8);
+            return d;
+        }
+
         private IEnumerable<object> ReadEx(params Type[] types)
         {
             foreach (var type in types)
@@ -213,7 +235,9 @@ namespace PacketClient
                     { typeof(uint),     (t) => { return ReadUInt(); } },
                     { typeof(long),     (t) => { return ReadLong(); } },
                     { typeof(ulong),    (t) => { return ReadULong(); } },
-                    { typeof(string),   (t) => { return ReadString(); } }
+                    { typeof(string),   (t) => { return ReadString(); } },
+                    { typeof(float),    (t) => { return ReadFloat(); } },
+                    { typeof(double),    (t) => { return ReadDouble(); } }
                 };
 
                 if (@switch.ContainsKey(type))
