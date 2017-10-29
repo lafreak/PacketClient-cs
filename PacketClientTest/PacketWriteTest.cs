@@ -21,6 +21,7 @@ namespace PacketClientTest
             packet.Write((byte)5);
 
             Assert.AreEqual(5, packet.Buffer[3]);
+            Assert.AreEqual(4, packet.Size);
         }
 
         [TestMethod]
@@ -29,6 +30,7 @@ namespace PacketClientTest
             packet.Write((sbyte)-1);
 
             Assert.AreEqual(255, packet.Buffer[3]);
+            Assert.AreEqual(4, packet.Size);
         }
 
         [TestMethod]
@@ -38,6 +40,7 @@ namespace PacketClientTest
 
             Assert.AreEqual(254, packet.Buffer[3]);
             Assert.AreEqual(255, packet.Buffer[4]);
+            Assert.AreEqual(5, packet.Size);
         }
 
         [TestMethod]
@@ -47,6 +50,7 @@ namespace PacketClientTest
 
             Assert.AreEqual(11, packet.Buffer[3]);
             Assert.AreEqual(0, packet.Buffer[4]);
+            Assert.AreEqual(5, packet.Size);
         }
 
         [TestMethod]
@@ -58,6 +62,7 @@ namespace PacketClientTest
             Assert.AreEqual(255, packet.Buffer[4]);
             Assert.AreEqual(255, packet.Buffer[5]);
             Assert.AreEqual(255, packet.Buffer[6]);
+            Assert.AreEqual(7, packet.Size);
         }
 
         [TestMethod]
@@ -69,6 +74,7 @@ namespace PacketClientTest
             Assert.AreEqual(0, packet.Buffer[4]);
             Assert.AreEqual(0, packet.Buffer[5]);
             Assert.AreEqual(0, packet.Buffer[6]);
+            Assert.AreEqual(7, packet.Size);
         }
 
         [TestMethod]
@@ -84,6 +90,7 @@ namespace PacketClientTest
             Assert.AreEqual(255, packet.Buffer[8]);
             Assert.AreEqual(255, packet.Buffer[9]);
             Assert.AreEqual(255, packet.Buffer[10]);
+            Assert.AreEqual(11, packet.Size);
         }
 
         [TestMethod]
@@ -99,6 +106,7 @@ namespace PacketClientTest
             Assert.AreEqual(0, packet.Buffer[8]);
             Assert.AreEqual(0, packet.Buffer[9]);
             Assert.AreEqual(0, packet.Buffer[10]);
+            Assert.AreEqual(11, packet.Size);
         }
 
         [TestMethod]
@@ -110,6 +118,7 @@ namespace PacketClientTest
             Assert.AreEqual(101, packet.Buffer[4]);
             Assert.AreEqual(121, packet.Buffer[5]);
             Assert.AreEqual(0, packet.Buffer[6]);
+            Assert.AreEqual(7, packet.Size);
         }
     }
 }

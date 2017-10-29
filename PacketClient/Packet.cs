@@ -18,6 +18,9 @@ namespace PacketClient
         public Packet(List<byte> data)
         {
             this.data = data;
+
+            if (Size > 1024)
+                SetSize(1024);
         }
 
         public byte Type { get { return data[2]; } }
@@ -62,6 +65,18 @@ namespace PacketClient
                 AddSize((ushort)bytes.Length);
             };
 
+            Action<object> writebyte = (arg) =>
+            {
+                data.Add((byte)arg);
+                AddSize(1);
+            };
+
+            Action<object> writesbyte = (arg) =>
+            {
+                data.Add(unchecked((byte)(sbyte)arg));
+                AddSize(1);
+            };
+
             Action<object> writestring = (arg) =>
             {
                 byte[] bytes = Encoding.ASCII.GetBytes((dynamic)arg);
@@ -73,8 +88,8 @@ namespace PacketClient
 
             var @switch = new Dictionary<Type, Action<object>>
             {
-                { typeof(byte),     write },
-                { typeof(sbyte),    write },
+                { typeof(byte),     writebyte },
+                { typeof(sbyte),    writesbyte },
                 { typeof(short),    write },
                 { typeof(ushort),   write },
                 { typeof(int),      write },

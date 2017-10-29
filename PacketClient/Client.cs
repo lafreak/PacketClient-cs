@@ -141,6 +141,14 @@ namespace PacketClient
             var packet = new Packet(type);
             packet.Write(args);
 
+            SendPacket(packet);
+        }
+
+        public void SendPacket(Packet packet)
+        {
+            if (!client.Connected)
+                return;
+
             try
             {
                 client.GetStream().Write(packet.Buffer, 0, packet.Size);
