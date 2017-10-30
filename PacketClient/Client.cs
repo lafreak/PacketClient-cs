@@ -23,6 +23,8 @@ namespace PacketClient
         public bool Connected { get { return client != null && client.Connected; } }
 
         IDictionary<byte, Action<Packet>> events = new Dictionary<byte, Action<Packet>>();
+        IDictionary<byte, IDictionary<string, Action<Packet>>> specifiedEvents =
+            new Dictionary<byte, IDictionary<string, Action<Packet>>>();
 
         public Client(string hostname, int port)
         {
@@ -88,6 +90,15 @@ namespace PacketClient
                             events[packet.Type](packet);
                         else
                             onUnknownPacket(packet);
+
+                        if (specifiedEvents.ContainsKey(packet.Type))
+                        {
+                            string id = packet.ReadString();
+                            if (specifiedEvents[packet.Type].ContainsKey(id))
+                            {
+                                specifiedEvents[packet.Type][id](packet);
+                            }
+                        }
                     });
                 }
                 catch
@@ -130,32 +141,46 @@ namespace PacketClient
 
         public void OnConnected(Action action)
         {
-            onConnected = action;
+            onConnected += action;
         }
 
         public void OnDisconnected(Action action)
         {
-            onDisconnected = action;
+            onDisconnected += action;
         }
 
         public void OnUnableToConnect(Action<Exception> action)
         {
-            onUnableToConnect = action;
+            onUnableToConnect += action;
         }
 
         public void OnUnknownPacket(Action<Packet> action)
         {
-            onUnknownPacket = action;
+            onUnknownPacket += (p) => { action(p.Duplicate()); };
         }
 
         public void On(byte type, Action<Packet> action)
         {
-            events[type] = action;
+            if (!events.ContainsKey(type))
+                events[type] = (p) => { };
+
+            events[type] += (p) => { action(p.Duplicate()); };
+        }
+
+        public void OnSpecified(byte type, string id, Action<Packet> action)
+        {
+            if (!specifiedEvents.ContainsKey(type))
+                specifiedEvents[type] = new Dictionary<string, Action<Packet>>();
+
+            if (!specifiedEvents[type].ContainsKey(id))
+                specifiedEvents[type][id] = (p) => { };
+
+            specifiedEvents[type][id] += (p) => { action(p.Duplicate()); };
         }
 
         public void Send(byte type, params object[] args)
         {
-            if (!client.Connected)
+            if (!Connected)
                 return;
             var packet = new Packet(type);
             packet.Write(args);
@@ -165,7 +190,7 @@ namespace PacketClient
 
         public void SendPacket(Packet packet)
         {
-            if (!client.Connected)
+            if (!Connected)
                 return;
 
             try

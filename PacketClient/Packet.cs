@@ -391,5 +391,10 @@ namespace PacketClient
         {
             return ReadEx(types).ToArray();
         }
+
+        public Packet Duplicate()
+        {
+            return new Packet(new List<byte>(this.data));
+        }
     }
 }
