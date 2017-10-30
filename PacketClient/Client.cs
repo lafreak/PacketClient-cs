@@ -12,13 +12,17 @@ namespace PacketClient
         int port;
         TcpClient client;
         bool firstConnectAttempt = true;
+        Thread worker;
+        bool shouldInvokeOnDisconnected = true;
 
         Action onConnected = () => { };
         Action onDisconnected = () => { };
         Action<Exception> onUnableToConnect = (e) => { };
         Action<Packet> onUnknownPacket = (packet) => { };
 
-        IDictionary<ushort, Action<Packet>> events = new Dictionary<ushort, Action<Packet>>();
+        public bool Connected { get { return client != null && client.Connected; } }
+
+        IDictionary<byte, Action<Packet>> events = new Dictionary<byte, Action<Packet>>();
 
         public Client(string hostname, int port)
         {
@@ -26,11 +30,22 @@ namespace PacketClient
             this.port = port;
         }
 
-        private void RunInBackground(ThreadStart method)
+        private void RunWorker(ThreadStart method)
         {
-            Thread t = new Thread(method);
-            t.IsBackground = true;
-            t.Start();
+            worker = new Thread(method);
+            worker.IsBackground = true;
+            worker.Start();
+        }
+
+        public void Disconnect()
+        {
+            if (worker == null)
+                return;
+
+            shouldInvokeOnDisconnected = false;
+
+            client.Close();
+            firstConnectAttempt = true;
         }
 
         public void Connect()
@@ -38,7 +53,7 @@ namespace PacketClient
             if (firstConnectAttempt)
             {
                 firstConnectAttempt = false;
-                RunInBackground(Connect);
+                RunWorker(Connect);
                 return;
             }
 
@@ -77,9 +92,12 @@ namespace PacketClient
                 }
                 catch
                 {
-                    client.GetStream().Close();
                     client.Close();
-                    onDisconnected();
+
+                    if (!shouldInvokeOnDisconnected)
+                        shouldInvokeOnDisconnected = true;
+                    else
+                        onDisconnected();
                     return;
                 }
             }
@@ -130,7 +148,7 @@ namespace PacketClient
             onUnknownPacket = action;
         }
 
-        public void On(ushort type, Action<Packet> action)
+        public void On(byte type, Action<Packet> action)
         {
             events[type] = action;
         }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PacketClient
 {
@@ -55,16 +54,93 @@ namespace PacketClient
             data.RemoveRange(3, size);
         }
 
+        private void WriteByte(byte arg)
+        {
+            data.Add((byte)arg);
+            AddSize(1);
+        }
+        
+        private void WriteSByte(sbyte arg)
+        {
+            data.Add(unchecked((byte)(sbyte)arg));
+            AddSize(1);
+        }
+
+        private void WriteShort(short arg)
+        {
+            byte[] bytes = BitConverter.GetBytes(arg);
+            foreach (var b in bytes)
+                data.Add(b);
+            AddSize((ushort)bytes.Length);
+        }
+
+        private void WriteUShort(short arg)
+        {
+            byte[] bytes = BitConverter.GetBytes(arg);
+            foreach (var b in bytes)
+                data.Add(b);
+            AddSize((ushort)bytes.Length);
+        }
+
+        private void WriteInt(int arg)
+        {
+            byte[] bytes = BitConverter.GetBytes(arg);
+            foreach (var b in bytes)
+                data.Add(b);
+            AddSize((ushort)bytes.Length);
+        }
+
+        private void WriteUInt(uint arg)
+        {
+            byte[] bytes = BitConverter.GetBytes(arg);
+            foreach (var b in bytes)
+                data.Add(b);
+            AddSize((ushort)bytes.Length);
+        }
+
+        private void WriteLong(long arg)
+        {
+            byte[] bytes = BitConverter.GetBytes(arg);
+            foreach (var b in bytes)
+                data.Add(b);
+            AddSize((ushort)bytes.Length);
+        }
+
+        private void WriteULong(ulong arg)
+        {
+            byte[] bytes = BitConverter.GetBytes((ulong)arg);
+            foreach (var b in bytes)
+                data.Add(b);
+            AddSize((ushort)bytes.Length);
+        }
+
+        private void WriteFloat(float arg)
+        {
+            byte[] bytes = BitConverter.GetBytes(arg);
+            foreach (var b in bytes)
+                data.Add(b);
+            AddSize((ushort)bytes.Length);
+        }
+
+        private void WriteDouble(double arg)
+        {
+            byte[] bytes = BitConverter.GetBytes(arg);
+            foreach (var b in bytes)
+                data.Add(b);
+            AddSize((ushort)bytes.Length);
+        }
+
+        private void WriteString(string arg)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(arg);
+            foreach (var b in bytes)
+                data.Add(b);
+            data.Add(0);
+            AddSize((ushort)(bytes.Length + 1));
+        }
+
         public void Write(params object[] args)
         {
-            Action<object> write = (arg) =>
-            {
-                byte[] bytes = BitConverter.GetBytes((dynamic)arg);
-                foreach (var b in bytes)
-                    data.Add(b);
-                AddSize((ushort)bytes.Length);
-            };
-
             Action<object> writebyte = (arg) =>
             {
                 data.Add((byte)arg);
@@ -77,9 +153,73 @@ namespace PacketClient
                 AddSize(1);
             };
 
+            Action<object> writeshort = (arg) =>
+            {
+                byte[] bytes = BitConverter.GetBytes((short)arg);
+                foreach (var b in bytes)
+                    data.Add(b);
+                AddSize((ushort)bytes.Length);
+            };
+
+            Action<object> writeushort = (arg) =>
+            {
+                byte[] bytes = BitConverter.GetBytes((ushort)arg);
+                foreach (var b in bytes)
+                    data.Add(b);
+                AddSize((ushort)bytes.Length);
+            };
+
+            Action<object> writeint = (arg) =>
+            {
+                byte[] bytes = BitConverter.GetBytes((int)arg);
+                foreach (var b in bytes)
+                    data.Add(b);
+                AddSize((ushort)bytes.Length);
+            };
+
+            Action<object> writeuint = (arg) =>
+            {
+                byte[] bytes = BitConverter.GetBytes((uint)arg);
+                foreach (var b in bytes)
+                    data.Add(b);
+                AddSize((ushort)bytes.Length);
+            };
+
+            Action<object> writelong = (arg) =>
+            {
+                byte[] bytes = BitConverter.GetBytes((long)arg);
+                foreach (var b in bytes)
+                    data.Add(b);
+                AddSize((ushort)bytes.Length);
+            };
+
+            Action<object> writeulong = (arg) =>
+            {
+                byte[] bytes = BitConverter.GetBytes((ulong)arg);
+                foreach (var b in bytes)
+                    data.Add(b);
+                AddSize((ushort)bytes.Length);
+            };
+
+            Action<object> writefloat = (arg) =>
+            {
+                byte[] bytes = BitConverter.GetBytes((float)arg);
+                foreach (var b in bytes)
+                    data.Add(b);
+                AddSize((ushort)bytes.Length);
+            };
+
+            Action<object> writedouble = (arg) =>
+            {
+                byte[] bytes = BitConverter.GetBytes((double)arg);
+                foreach (var b in bytes)
+                    data.Add(b);
+                AddSize((ushort)bytes.Length);
+            };
+
             Action<object> writestring = (arg) =>
             {
-                byte[] bytes = Encoding.ASCII.GetBytes((dynamic)arg);
+                byte[] bytes = Encoding.ASCII.GetBytes((string)arg);
                 foreach (var b in bytes)
                     data.Add(b);
                 data.Add(0);
@@ -90,15 +230,15 @@ namespace PacketClient
             {
                 { typeof(byte),     writebyte },
                 { typeof(sbyte),    writesbyte },
-                { typeof(short),    write },
-                { typeof(ushort),   write },
-                { typeof(int),      write },
-                { typeof(uint),     write },
-                { typeof(long),    write },
-                { typeof(ulong),   write },
+                { typeof(short),    writeshort },
+                { typeof(ushort),   writeushort },
+                { typeof(int),      writeint },
+                { typeof(uint),     writeuint },
+                { typeof(long),     writelong },
+                { typeof(ulong),    writeulong },
                 { typeof(string),   writestring },
-                { typeof(float), write },
-                { typeof(double), write }
+                { typeof(float),    writefloat },
+                { typeof(double),   writedouble }
             };
 
             foreach (var arg in args)
