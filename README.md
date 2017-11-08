@@ -83,6 +83,6 @@ client.On(102, (packet) =>
   var data = packet.Read(typeof(byte), typeof(sbyte), typeof(string));
   byte b_ = (byte)data[0];
   sbyte sb_ = (sbyte)data[1];
-  string message_ = (message)data[2];
+  string message_ = (string)data[2];
 });
 ```
