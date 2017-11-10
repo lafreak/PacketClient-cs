@@ -20,8 +20,6 @@ namespace PacketClient
         Action<Exception> onUnableToConnect = (e) => { };
         Action<Packet> onUnknownPacket = (packet) => { };
 
-        public bool Connected { get { return client != null && client.Connected; } }
-
         IDictionary<byte, Action<Packet>> events = new Dictionary<byte, Action<Packet>>();
         IDictionary<byte, IDictionary<string, Action<Packet>>> specifiedEvents =
             new Dictionary<byte, IDictionary<string, Action<Packet>>>();
@@ -117,7 +115,10 @@ namespace PacketClient
         private IEnumerable<Packet> Receive()
         {
             byte[] buffer = new byte[1024];
-            int n = client.GetStream().Read(buffer, 0, 1024);
+            var stream = client.GetStream();
+            if (stream == null) yield return null;
+
+            int n = stream.Read(buffer, 0, 1024);
 
             while (n > 0)
             {
@@ -200,6 +201,24 @@ namespace PacketClient
             catch
             {
                 onDisconnected();
+            }
+        }
+
+        public bool Connected
+        {
+            get
+            {
+                if (client == null)
+                    return false;
+
+                try
+                {
+                    return client.Connected;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
     }
