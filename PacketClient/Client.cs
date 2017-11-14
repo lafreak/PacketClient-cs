@@ -24,6 +24,8 @@ namespace PacketClient
         IDictionary<byte, IDictionary<string, Action<Packet>>> specifiedEvents =
             new Dictionary<byte, IDictionary<string, Action<Packet>>>();
 
+        public Client() { }
+
         public Client(string hostname, int port)
         {
             this.hostname = hostname;
@@ -46,6 +48,13 @@ namespace PacketClient
 
             client.Close();
             firstConnectAttempt = true;
+        }
+
+        public void Connect(string hostname, int port)
+        {
+            this.hostname = hostname;
+            this.port = port;
+            Connect();
         }
 
         public void Connect()
